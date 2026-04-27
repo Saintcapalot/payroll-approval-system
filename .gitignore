@@ -9,3 +9,5 @@ TestResults/
 *.pdb
 *.log
 appsettings.Development.json
+logs/
+.env

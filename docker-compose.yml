@@ -1,0 +1,31 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-payroll_approval}
+      POSTGRES_USER: ${POSTGRES_USER:-payroll_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-payroll_pass}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-payroll_user} -d ${POSTGRES_DB:-payroll_approval}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build: .
+    environment:
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Development}
+      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=${POSTGRES_DB:-payroll_approval};Username=${POSTGRES_USER:-payroll_user};Password=${POSTGRES_PASSWORD:-payroll_pass}
+      - JwtSettings__Key=${JWT_KEY:-super_secret_dev_key_123456789}
+    ports:
+      - "${API_PORT:-8080}:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  postgres_data:

@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using PayrollApprovalSystem.Api.Extensions;
 using PayrollApprovalSystem.Infrastructure.Extensions;
 using PayrollApprovalSystem.Infrastructure.Persistence;
+using QuestPDF.Infrastructure;
 using Serilog;
 
 Log.Logger = new LoggerConfiguration()
@@ -18,6 +19,8 @@ try
     Log.Information("Starting Payroll Approval System API");
 
     var builder = WebApplication.CreateBuilder(args);
+
+    QuestPDF.Settings.License = LicenseType.Community;
 
     builder.Host.UseSerilog((context, services, loggerConfig) =>
         loggerConfig.ReadFrom.Configuration(context.Configuration));

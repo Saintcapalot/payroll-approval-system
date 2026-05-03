@@ -67,6 +67,33 @@ docker compose up --build
 
 - http://localhost:8080/swagger
 
+### Development Seed Data
+
+When `ASPNETCORE_ENVIRONMENT=Development`, the API applies EF Core migrations and then seeds demo data automatically after startup.
+
+Seeded records:
+
+- 1 Department: `Engineering`
+- 1 Employee: `Demo Employee` (`demo.employee@payroll.local`)
+- 1 active PayrollStructure for that employee
+  - Base salary: `50000`
+  - Bonus: `5000`
+  - Deductions: `1500`
+
+The seeding is idempotent, so restarting `docker compose up` will not create duplicate demo rows.
+
+### Swagger Demo Flow
+
+After `docker compose up --build` completes:
+
+1. Open `http://localhost:8080/swagger`
+2. Authenticate with any existing JWT flow already configured in the API
+3. Call `GET /api/Employee` to confirm the seeded employee is present
+4. Use the seeded employee id to generate payroll from `POST /api/Payroll/generate`
+5. Approve the payroll through `POST /api/Approval/approve`
+6. Generate a payslip via `POST /api/Payslip/generate`
+7. Download the PDF from `GET /api/Payslip/{payrollId}/pdf`
+
 ## Environment Variables
 
 Defined in `.env.example`:

@@ -63,6 +63,9 @@ try
     {
         var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         dbContext.Database.Migrate();
+
+        if (app.Environment.IsDevelopment())
+            await DatabaseSeeder.SeedDevelopmentDataAsync(dbContext);
     }
 
     // Configure pipeline

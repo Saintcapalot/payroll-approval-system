@@ -1,3 +1,4 @@
+using PayrollApprovalSystem.Api.Services;
 using PayrollApprovalSystem.Application.Services;
 
 namespace PayrollApprovalSystem.Api.Extensions;
@@ -10,6 +11,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<PayrollGenerationService>();
         services.AddScoped<ApprovalService>();
         services.AddScoped<PayslipService>();
+        services.AddScoped<PayslipPdfService>();
 
         return services;
     }

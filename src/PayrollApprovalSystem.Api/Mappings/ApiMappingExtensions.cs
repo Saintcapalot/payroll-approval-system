@@ -1,8 +1,8 @@
 using PayrollApprovalSystem.Api.DTOs.Approval;
+using PayrollApprovalSystem.Api.DTOs.Employee;
 using PayrollApprovalSystem.Domain.Entities;
 using PayrollApprovalSystem.Api.DTOs.Payroll;
 using PayrollApprovalSystem.Api.DTOs.Payslip;
-
 
 namespace PayrollApprovalSystem.Api.Mappings;
 
@@ -36,12 +36,23 @@ public static class ApiMappingExtensions
         };
     }
 
-	public static PayslipResponseDto ToDto(this Payslip payslip)
+    public static PayslipResponseDto ToDto(this Payslip payslip)
     {
         return new PayslipResponseDto
         {
             PayslipId = payslip.Id,
             PayrollId = payslip.PayrollId
+        };
+    }
+
+    public static EmployeeResponseDto ToDto(this Employee employee)
+    {
+        return new EmployeeResponseDto
+        {
+            Id = employee.Id,
+            FullName = $"{employee.FirstName} {employee.LastName}".Trim(),
+            Email = employee.Email,
+            DepartmentId = employee.DepartmentId
         };
     }
 }

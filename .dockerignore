@@ -7,5 +7,5 @@ obj/
 *.suo
 .vs/
 .idea/
-tests/
+# tests/
 appsettings.Development.json

@@ -30,6 +30,18 @@ try
     builder.Services.AddSwaggerDocumentation();
     builder.Services.AddApiServices();
 
+    //  CORS (for demo.html)
+    builder.Services.AddCors(options =>
+    {
+        options.AddPolicy("AllowDemoClient", policy =>
+        {
+            policy
+                .WithOrigins("http://localhost:63342") // din demo-side
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+        });
+    });
+
     // Infrastructure (PostgreSQL + repositories)
     builder.Services.AddInfrastructure(
         builder.Configuration.GetConnectionString("DefaultConnection")!);
@@ -76,8 +88,13 @@ try
     }
 
     app.UseHttpsRedirection();
+
+    //  Enable CORS
+    app.UseCors("AllowDemoClient");
+
     app.UseAuthentication();
     app.UseAuthorization();
+
     app.MapControllers();
 
     app.Run();

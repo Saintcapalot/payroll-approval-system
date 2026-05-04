@@ -36,7 +36,7 @@ try
         options.AddPolicy("AllowDemoClient", policy =>
         {
             policy
-                .WithOrigins("http://localhost:63342") // din demo-side
+                .AllowAnyOrigin()
                 .AllowAnyHeader()
                 .AllowAnyMethod();
         });

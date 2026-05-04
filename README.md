@@ -35,8 +35,8 @@ Løsningen er bygget etter prinsippene for Clean Architecture:
 ```
 
 API
-└── Application
-└── Domain
+Application
+Domain
 Infrastructure
 
 ````
@@ -79,6 +79,7 @@ Systemet består av følgende hovedentiteter:
 - Payroll (Lønn)  
 - Approval (Godkjenning)  
 - Payslip (Lønnsslipp)  
+
 
 ---
 

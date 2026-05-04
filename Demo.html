@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Payroll Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #0f172a;
+            color: white;
+            text-align: center;
+            padding: 40px;
+        }
+
+        h1 {
+            margin-bottom: 10px;
+        }
+
+        .container {
+            background: #1e293b;
+            padding: 30px;
+            border-radius: 12px;
+            display: inline-block;
+            min-width: 350px;
+        }
+
+        button {
+            display: block;
+            width: 100%;
+            margin: 10px 0;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background: #3b82f6;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #2563eb;
+        }
+
+        .status {
+            margin-top: 20px;
+            padding: 10px;
+            background: #020617;
+            border-radius: 8px;
+            font-size: 13px;
+            word-break: break-word;
+        }
+    </style>
+</head>
+
+<body>
+
+<h1>Payroll System Demo</h1>
+
+<div class="container">
+    <button onclick="login()">1. Login</button>
+    <button onclick="getEmployee()">2. Load Employee</button>
+    <button onclick="generatePayroll()">3. Generate Payroll</button>
+    <button onclick="approve()">4. Approve Payroll</button>
+    <button onclick="openPdf()">5. Open Payslip PDF</button>
+
+    <div class="status" id="status">
+        Status: Ready
+    </div>
+</div>
+
+<script>
+    let token = "";
+    let employeeId = "";
+    let payrollId = "";
+
+    const baseUrl = "http://localhost:8080/api";
+
+    function setStatus(msg) {
+        document.getElementById("status").innerText = "Status: " + msg;
+    }
+
+    async function login() {
+        try {
+            setStatus("Logging in...");
+
+            const res = await fetch(`${baseUrl}/Auth/login`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    username: "admin",
+                    password: "admin123"
+                })
+            });
+
+            const data = await res.json();
+            token = data.token;
+
+            setStatus("Logged in ");
+        } catch (e) {
+            setStatus("Login failed ");
+        }
+    }
+
+    async function getEmployee() {
+        try {
+            setStatus("Fetching employee...");
+
+            const res = await fetch(`${baseUrl}/Employee`, {
+                headers: {
+                    Authorization: "Bearer " + token
+                }
+            });
+
+            const data = await res.json();
+            employeeId = data[0].id;
+
+            setStatus("Employee loaded " + employeeId);
+        } catch (e) {
+            setStatus("Failed to load employee ");
+        }
+    }
+
+    async function generatePayroll() {
+        try {
+            setStatus("Generating payroll...");
+
+            const res = await fetch(`${baseUrl}/Payroll/generate`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: "Bearer " + token
+                },
+                body: JSON.stringify({
+                    employeeId: employeeId,
+                    month: 1,
+                    year: 2026
+                })
+            });
+
+            const data = await res.json();
+            console.log("Payroll response:", data);
+
+            payrollId =
+                data.payrollId ||
+                data.id ||
+                data.PayrollId ||
+                data.Id;
+
+            setStatus("Payroll created " + payrollId);
+        } catch (e) {
+            setStatus("Payroll failed ");
+        }
+    }
+
+    async function approve() {
+        try {
+            setStatus("Approving payroll...");
+
+            await fetch(`${baseUrl}/Approval/approve`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: "Bearer " + token
+                },
+                body: JSON.stringify({
+                    payrollId: payrollId
+                })
+            });
+
+            setStatus("Payroll approved ");
+        } catch (e) {
+            setStatus("Approval failed ");
+        }
+    }
+
+    async function openPdf() {
+        if (!payrollId) {
+            setStatus("Generate payroll first");
+            return;
+        }
+
+        try {
+            setStatus("Downloading PDF...");
+
+            const res = await fetch(`${baseUrl}/Payslip/${payrollId}/pdf`, {
+                headers: {
+                    Authorization: "Bearer " + token
+                }
+            });
+
+            if (!res.ok) {
+                setStatus("PDF failed: " + res.status);
+                return;
+            }
+
+            const blob = await res.blob();
+            const url = window.URL.createObjectURL(blob);
+
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "payslip.pdf";
+            a.click();
+
+            setStatus("PDF downloaded");
+        } catch {
+            setStatus("PDF failed");
+        }
+    
+    }
+</script>
+
+</body>
+</html>
